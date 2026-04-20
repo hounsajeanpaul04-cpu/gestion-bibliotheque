@@ -1,0 +1,189 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "API Bibliothèque Mobile",
+    "description": "Documentation des services pour l'application de gestion de livres.",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8000/api",
+      "description": "Serveur Local"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  },
+  "paths": {
+    "/tokens/create": {
+      "post": {
+        "tags": ["Authentification"],
+        "summary": "Se connecter pour obtenir un Token",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": { "type": "string", "example": "admin@test.com" },
+                  "password": { "type": "string", "example": "password" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Token généré avec succès" },
+          "401": { "description": "Identifiants incorrects" }
+        }
+      }
+    },
+    "/books": {
+      "get": {
+        "tags": ["Livres"],
+        "summary": "Lister tous les livres",
+        "responses": {
+          "200": { "description": "Liste des livres récupérée" }
+        }
+      },
+      "post": {
+        "tags": ["Livres"],
+        "summary": "Ajouter un nouveau livre",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "201": { "description": "Livre créé" }
+        }
+      }
+    },
+    "/books/import": {
+      "post": {
+        "tags": ["Livres"],
+        "summary": "Importation massive via CSV",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Importation réussie" }
+        }
+      }
+    },
+    "/books/{id}/reserve": {
+      "post": {
+        "tags": ["Emprunts"],
+        "summary": "S'inscrire sur la file d'attente d'un livre",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer" }
+          }
+        ],
+        "responses": {
+          "200": { "description": "Inscription réussie" }
+        }
+      }
+    },
+    "/borrowings": {
+      "get": {
+        "tags": ["Emprunts"],
+        "summary": "Voir mes emprunts en cours",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": { "description": "Succès" }
+        }
+      },
+      "post": {
+        "tags": ["Emprunts"],
+        "summary": "Emprunter un livre",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "book_id": { "type": "integer", "example": 1 }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Emprunt validé" }
+        }
+      }
+    },
+    "/profile/me": {
+      "get": {
+        "tags": ["Profil"],
+        "summary": "Récupérer mes informations personnelles",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": { "description": "Données du profil" }
+        }
+      }
+    },
+
+    "/admin/dashboard": {
+  "get": {
+    "tags": ["Administration"],
+    "summary": "Récupérer les statistiques du tableau de bord",
+    "description": "Retourne le nombre total de livres, d'emprunts actifs et d'utilisateurs.",
+    "security": [{ "bearerAuth": [] }],
+    "responses": {
+      "200": {
+        "description": "Données du tableau de bord récupérées avec succès",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "total_books": { "type": "integer", "example": 150 },
+                "active_borrowings": { "type": "integer", "example": 12 },
+                "total_users": { "type": "integer", "example": 45 },
+                "recent_activities": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "message": { "type": "string", "example": "Nouveau livre ajouté : L'Étranger" },
+                      "date": { "type": "string", "format": "date-time" }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "401": { "description": "Non autorisé (Token manquant)" },
+      "403": { "description": "Accès refusé (Réservé aux admins)" }
+    }
+  }
+
+  }
+}
+}
+ 
