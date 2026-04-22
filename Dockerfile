@@ -2,7 +2,7 @@ FROM php:8.4-apache
 
 RUN apt-get update && apt-get install -y \
     git curl libpng-dev libjpeg-dev libfreetype6-dev \
-    libpq-dev libzip-dev zip unzip \
+    libpq-dev libzip-dev zip unzip nodejs npm \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install -j$(nproc) \
         gd pdo pdo_pgsql pgsql zip bcmath opcache \
@@ -17,6 +17,8 @@ WORKDIR /var/www/html
 COPY . .
 
 RUN composer install --no-dev --optimize-autoloader --no-scripts --ignore-platform-reqs
+
+RUN npm install && npm run build
 
 RUN chown -R www-data:www-data /var/www/html \
     && chmod -R 775 storage bootstrap/cache
