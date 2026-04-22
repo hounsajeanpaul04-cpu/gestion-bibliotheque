@@ -29,4 +29,6 @@ RUN sed -i 's|/var/www/html|/var/www/html/public|g' /etc/apache2/sites-available
 
 EXPOSE 80
 
-CMD ["sh", "-c", "cp /etc/secrets/.env /var/www/html/.env && php artisan config:clear && php artisan migrate --force && php artisan tinker --execute=\"\\App\\Models\\User::firstOrCreate(['email' => 'admin@bibliotheque.com'], ['name' => 'Admin', 'password' => bcrypt('password123'), 'is_admin' => true]);\" && apache2-foreground"]
+COPY start.sh /start.sh
+RUN chmod +x /start.sh
+CMD ["/start.sh"]
