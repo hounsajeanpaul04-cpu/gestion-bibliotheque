@@ -1,32 +1,26 @@
 <?php
 
 namespace App\Http\Middleware;
+
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Illuminate\Support\Facades\Auth; // ✅ IMPORTANT
+use Illuminate\Support\Facades\Auth;
+
 class CheckRole
 {
-    /**
-     * Handle an incoming request.
-     *
-     * @param  Closure(Request): (Response)  $next
-     */
-    public function handle(Request $request, Closure $next,... $roles): Response
+    public function handle(Request $request, Closure $next, ...$roles): Response
     {
-
-       // 1. Vérifier si l'utilisateur est connecté
-
-        if (!auth::check()) {
-            return response()->json(['message' => 'Non authentifié'], 401);
+        // 1. Vérifier si l utilisateur est connecté
+        if (!Auth::check()) {
+            return redirect()->route('login');
         }
 
-        // 2. Vérifier si le rôle de l'utilisateur est dans la liste autorisée
-        // On suppose que votre table 'users' a une colonne 'role'
-       
-       if (!in_array(Auth::user()->role, $roles)) {
-            abort(403, "Accès refusé : vous n'avez pas le rôle requis.");
+        // 2. Vérifier si le rôle est autorisé
+        if (!in_array(Auth::user()->role, $roles)) {
+            abort(403, "Accès refusé : vous n avez pas le rôle requis.");
         }
+
         return $next($request);
     }
 }
