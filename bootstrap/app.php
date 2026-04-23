@@ -13,12 +13,14 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
-        
+
+        // Faire confiance au proxy Render (HTTPS)
+        $middleware->trustProxies(at: '*');
+
         // 1. Redirection personnalisée après connexion
-        // C'est ici que l'on définit où vont les utilisateurs connectés
         $middleware->redirectTo(
             guests: '/login',
-            users: '/dashboard' 
+            users: '/dashboard'
         );
 
         // 2. On conserve tes alias de middleware
@@ -29,7 +31,7 @@ return Application::configure(basePath: dirname(__DIR__))
 
         // 3. On conserve tes exceptions CSRF pour l'API
         $middleware->preventRequestForgery(except: [
-            'api/*', 
+            'api/*',
         ]);
 
     })
