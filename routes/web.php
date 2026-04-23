@@ -7,13 +7,13 @@ use App\Http\Controllers\Api\LoanController;
 use Illuminate\Support\Facades\Route;
 use App\Models\Loan;
 use App\Mail\OverdueLoanReminder;
-// Force la déconnexion en GET pour éviter ton erreur 405
+// Force la dÃ©connexion en GET pour Ã©viter ton erreur 405
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])
     ->name('logout');
 // --- 1. ACCUEIL ET CATALOGUE PUBLIC ---
 Route::get('/accueil', [BookController::class, 'index'])
-    ->middleware(['auth', 'verified'])
+    ->middleware(['auth'])
     ->name('accueil');
 
 Route::get('/', function () {
@@ -27,7 +27,7 @@ Route::get('/books/{id}', [BookController::class, 'show'])
     ->name('books.show')
     ->where('id', '[0-9]+'); 
 
-// --- 2. ROUTES PROTÉGÉES ---
+// --- 2. ROUTES PROTÃ‰GÃ‰ES ---
 Route::middleware('auth')->group(function () {
     
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -49,7 +49,7 @@ Route::middleware('auth')->group(function () {
 
         // Gestion des Livres
         Route::prefix('books')->group(function () {
-            // --- LA ROUTE AJOUTÉE ICI ---
+            // --- LA ROUTE AJOUTÃ‰E ICI ---
             Route::get('/download-template', [BookController::class, 'downloadTemplate'])
                 ->name('books.download-template');
 
@@ -73,7 +73,7 @@ Route::middleware('auth')->group(function () {
 // --- 5. TESTS ---
 Route::get('/test-mail', function () {
     $loan = Loan::with(['user', 'book'])->first();
-    if (!$loan) return "Erreur : Aucun prêt trouvé.";
+    if (!$loan) return "Erreur : Aucun prÃªt trouvÃ©.";
     return new OverdueLoanReminder($loan);
 });
 
